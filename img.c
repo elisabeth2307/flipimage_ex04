@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define DATALENGTH 255
+#define DEBUG
 
 void pbm_image_free(PbmImage* img) {
 
@@ -74,14 +75,28 @@ PbmImage* pbm_image_load_from_stream(FILE* stream, int* error) {
 	pbmimage.height = heightInt;
 
 	printf("width: %d, height: %d\n", widthInt, heightInt);
+	
+	// eliminate maximum intensity
+	fgets(data, 5, stream);
+	
 
-	// allocate memory
-	uint64_t* = malloc(widthInt*heightInt*sizeof(char));
+	// allocate memory for pixel-bytes
+	char* imgdata = malloc(widthInt*heightInt*sizeof(char));
+
+	// read data from file
+	fread(imgdata, sizeof(char), widthInt*heightInt, stream);
+
+	#ifdef DEBUG
+	for (int k = 0; k<widthInt*heightInt; k++) {
+		printf("%d\n", imgdata[k]);
+	}
+	#endif
 
 	// store data in struct
-	while(){
 
-	}
+
+	printf("------------------------------------\n");
+
 
 	return NULL;
 }
