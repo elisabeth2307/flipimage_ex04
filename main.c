@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "img.h"
+#include "flip.h"
 
 int main (int argc, char* argv[]){
 	int error = RET_PBM_OK;
@@ -11,24 +12,24 @@ int main (int argc, char* argv[]){
 		return -1;
 	}
 
+	//----------------------------------------------------------------------------
 	// read file
 	FILE *f;
 	f = fopen(argv[1], "r");
+
 	// call function for read from stream
 	PbmImage* image = pbm_image_load_from_stream(f, &error);
 
 	printf("Error: %d\n", error);
 
+	//----------------------------------------------------------------------------
 	// check if image is empty
 	if(image == NULL) {
 		fprintf(stderr, "Sorry, something went wrong!\n");
 		return -1;
 	}
 
-
-
-	// allocate memory for input file here or in image?
-	// 
+	pbm_image_flip (image);
 
 	// int pbm_image_flip(PbmImage* image); -> int pbm_image_write_to_stream(PbmImage* img, FILE* targetStream);
 

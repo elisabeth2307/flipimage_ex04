@@ -6,14 +6,16 @@
 #define DEBUG
 
 void pbm_image_free(PbmImage* img) {
-
+	free(img);
 }
 
 
 PbmImage* pbm_image_load_from_stream(FILE* stream, int* error) {
+	printf("----------------IMAGE---------------\n");
 	// image which is returned in the end
-	PbmImage pbmimage;
+	PbmImage* pbmimage = malloc (sizeof(PbmImage));
 
+	//--------------------------------------------------------------------
 	// open input-file and check if it's empty or not
 	if (stream == NULL) {
 		printf("File is empty\n");
@@ -35,30 +37,35 @@ PbmImage* pbm_image_load_from_stream(FILE* stream, int* error) {
 		return NULL;
 	}
 
+	//--------------------------------------------------------------------
 	// get type of image
 	char imgtype[3];
 	memcpy(imgtype, &str, 3*sizeof(*str));
 	// store type in image struct
-	strcpy(pbmimage.type, imgtype);
+	strcpy((*pbmimage).type, imgtype);
 
+	//--------------------------------------------------------------------
 	// skip comments
 	char data[DATALENGTH];
-	data[0] = '#'; // necessary to get into while-loop
-	while (data[0]=='#'){
+	data[0] = PBM_COMMENT_CHAR; // necessary to get into while-loop
+	while (data[0] == PBM_COMMENT_CHAR){
 		fgets(data, DATALENGTH, stream);
 	}
 
+	//--------------------------------------------------------------------
 	// while loop to get width (first number in line which is stored in data)
 	int i = 0;
-	char width[4];
+	int j = 0; // for height array
+	char height[4]; // we only support images
+	char width[4];	// up to 9999x9999 pixels
+
 	while (data[i] != ' ') {
 		width[i] = data[i];
 		i++;
 	}
 
 	i++; // important to skip space
-	int j = 0; // for height array
-	char height[4];
+	
 	// while loop to get height (second number -> right after space)
 	while (data[i] != 0) {
 		height[j] = data[i];
@@ -71,34 +78,31 @@ PbmImage* pbm_image_load_from_stream(FILE* stream, int* error) {
 	int heightInt = atoi(height);
 
 	// store in image struct
-	pbmimage.width = widthInt;
-	pbmimage.height = heightInt;
+	(*pbmimage).width = widthInt;
+	(*pbmimage).height = heightInt;
 
+	printf("------------------------------------\n");
 	printf("width: %d, height: %d\n", widthInt, heightInt);
 	
+	//--------------------------------------------------------------------
 	// eliminate maximum intensity
 	fgets(data, 5, stream);
 	
-
+	//--------------------------------------------------------------------
 	// allocate memory for pixel-bytes
-	char* imgdata = malloc(widthInt*heightInt*sizeof(char));
+	(*pbmimage).data = malloc(widthInt*heightInt*sizeof(char));
 
-	// read data from file
-	fread(imgdata, sizeof(char), widthInt*heightInt, stream);
+	// read data from file and store in struct
+	fread((*pbmimage).data, sizeof(char), widthInt*heightInt, stream);
 
 	#ifdef DEBUG
 	for (int k = 0; k<widthInt*heightInt; k++) {
-		printf("%d\n", imgdata[k]);
+		printf("%c", (*pbmimage).data[k]);
 	}
 	#endif
 
-	// store data in struct
-
-
-	printf("------------------------------------\n");
-
-
-	return NULL;
+	printf("\n------------------------------------\n");
+	return (pbmimage);
 }
 
 
