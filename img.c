@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define DATALENGTH 255
-#define DEBUG
+//#define DEBUG
 
 void pbm_image_free(PbmImage* img) {
 	free(img);
@@ -11,7 +11,7 @@ void pbm_image_free(PbmImage* img) {
 
 
 PbmImage* pbm_image_load_from_stream(FILE* stream, int* error) {
-	printf("----------------IMAGE---------------\n");
+	printf("--------------IMAGE-READ-------------\n");
 	// image which is returned in the end
 	PbmImage* pbmimage = malloc (sizeof(PbmImage));
 
@@ -27,10 +27,17 @@ PbmImage* pbm_image_load_from_stream(FILE* stream, int* error) {
 	printf("File successfully read\n");
 	
 	// if first line is not P5 -> exit programm
-	char str[4]; // 4 is the smallest possible amount of chars for this purpose
-	fgets(str, 4, stream);
+	//char str[3]; // 4 is the smallest possible amount of chars for this purpose
+	fgets((*pbmimage).type, 4, stream);
 
-	if (!strcmp(str, PBM_TYPE_P5)){
+	#ifdef DEBUG
+		printf("%c\n", str[0]);
+		printf("%c\n", str[1]);
+		printf("%c\n", str[2]);
+		printf("%c\n", str[3]);
+	#endif
+
+	if (!strcmp((*pbmimage).type, PBM_TYPE_P5)){
 		printf("Unsupported format\n");
 		fclose(stream);
 		*error = RET_UNSUPPORTED_FILE_FORMAT;
@@ -39,10 +46,10 @@ PbmImage* pbm_image_load_from_stream(FILE* stream, int* error) {
 
 	//--------------------------------------------------------------------
 	// get type of image
-	char imgtype[3];
-	memcpy(imgtype, &str, 3*sizeof(*str));
+	//char imgtype[3];
+	//memcpy(imgtype, &str, 3*sizeof(*str));
 	// store type in image struct
-	strcpy((*pbmimage).type, imgtype);
+	//strcpy((*pbmimage).type, imgtype);
 
 	//--------------------------------------------------------------------
 	// skip comments
@@ -108,5 +115,17 @@ PbmImage* pbm_image_load_from_stream(FILE* stream, int* error) {
 
 
 int pbm_image_write_to_stream(PbmImage* img, FILE* targetStream) {
-	return 0;
+	printf("-------------IMAGE-WRITE-------------\n");
+	char* comment = "# FLIPPED by H&H";
+	char* intensity = "255\n";
+	int pixels = (*img).width * (*img).height;
+
+	// write type, comment and width+height to file
+	fprintf(targetStream, "%s%s\n%d %d\n", (*img).type, comment, (*img).width, (*img).height);  // comment + width and height
+	fwrite (intensity, sizeof(char), strlen(intensity), targetStream); // intensity
+	fwrite((*img).data, sizeof(char), pixels, targetStream); // type
+
+	printf("File successfully written");
+
+	return RET_PBM_OK;
 }

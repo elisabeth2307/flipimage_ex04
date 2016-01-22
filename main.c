@@ -13,27 +13,38 @@ int main (int argc, char* argv[]){
 	}
 
 	//----------------------------------------------------------------------------
-	// read file
+	// open files
 	FILE *f;
 	f = fopen(argv[1], "r");
 
+
+	FILE *destf;
+	destf = fopen(argv[2], "w");
+	
+	//----------------------------------------------------------------------------
+
 	// call function for read from stream
 	PbmImage* image = pbm_image_load_from_stream(f, &error);
-
 	printf("Error: %d\n", error);
 
-	//----------------------------------------------------------------------------
 	// check if image is empty
 	if(image == NULL) {
 		fprintf(stderr, "Sorry, something went wrong!\n");
 		return -1;
 	}
 
-	pbm_image_flip (image);
+	// flip image
+	error = pbm_image_flip (image);
+	printf("Error: %d\n", error);
 
-	// int pbm_image_flip(PbmImage* image); -> int pbm_image_write_to_stream(PbmImage* img, FILE* targetStream);
+	// write flipped image to out-file
+	error = pbm_image_write_to_stream(image, destf);
+	printf("Error: %d\n", error);
+
 
 	// free input file memory
+
+	// close files?
 
 	return 0;
 }

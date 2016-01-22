@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "flip.h"
-#define DEBUG
+//#define DEBUG
 
 int pbm_image_flip(PbmImage* image) {
 	printf("----------------FLIP----------------\n");
