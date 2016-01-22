@@ -123,9 +123,9 @@ int pbm_image_write_to_stream(PbmImage* img, FILE* targetStream) {
 	// write type, comment and width+height to file
 	fprintf(targetStream, "%s%s\n%d %d\n", (*img).type, comment, (*img).width, (*img).height);  // comment + width and height
 	fwrite (intensity, sizeof(char), strlen(intensity), targetStream); // intensity
-	fwrite((*img).data, sizeof(char), pixels, targetStream); // type
+	fwrite((*img).data, sizeof(char), pixels, targetStream); // data
 
-	printf("File successfully written");
+	printf("File successfully written\n");
 
 	return RET_PBM_OK;
 }
